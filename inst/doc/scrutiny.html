@@ -39,6 +39,108 @@ ul.task-list{list-style: none;}
 
 
 
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -241,21 +343,52 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <p>The roundwork package was outsourced from <a href="https://lhdjung.github.io/scrutiny/">scrutiny</a>, a much larger
 and less focused package. (See <a href="https://github.com/ianhussey/ERROR/issues/6">this Github issue</a>
-for the rationale.) However, all functions that were copied to roundwork
-are still part of scrutiny as of version 0.5.0.</p>
-<p>For now, this can create ambiguities when using both packages
-together. Here is how to avoid such problems in an interactive script.
-Package developers should simply use <code>package::function()</code>
-syntax, as usual.</p>
+for the rationale.)</p>
+<p>roundwork only contains the rounding layer:</p>
+<ul>
+<li>The individual rounding procedures (<code>round_up()</code>,
+<code>round_ceiling()</code>, <code>round_ties_away()</code>, and so
+on);</li>
+<li><code>reround()</code>, the interface that names each procedure by a
+string;</li>
+<li><code>unround()</code> and <code>bound_numerators()</code>, which
+run the same procedures backwards to recover the range of an unknown
+original number;</li>
+<li><code>sum_range()</code>, which finds the whole-number sums behind a
+rounded mean;</li>
+<li><code>reround_to_fraction()</code> and
+<code>rounding_bias()</code>;</li>
+<li><code>resolve_ties_rounding()</code>, for functions that branch on
+<code>rounding</code> themselves.</li>
+</ul>
+<p>The error detection techniques that build on this layer — GRIM,
+GRIMMER, DEBIT — live in scrutiny. From version 1.0.0 on, scrutiny
+imports its rounding from roundwork and no longer exports any rounding
+functions of its own.</p>
 <div id="resolving-conflicts" class="section level2">
 <h2>Resolving conflicts</h2>
-<p>Make sure that all roundwork functions are used instead of their
-scrutiny counterparts by the same names. To do so, use the <a href="https://conflicted.r-lib.org/index.html">conflicted</a>
-package:</p>
+<p>Before its 1.0.0 version, scrutiny had its own copies of the rounding
+functions, some of them under the same names. Attaching both packages —
+roundwork and an older version of scrutiny — can create ambiguity. These
+copies are older, and some of them behave differently: for example,
+<code>round_down_from()</code> reads <code>threshold</code> differently
+there.</p>
+<p>I strongly recommend using scrutiny 1.0.0 or later. However, just in
+case you use roundwork together with scrutiny 0.6.1 or earlier, use the
+<a href="https://conflicted.r-lib.org/index.html">conflicted</a> package
+to clarify which package you mean when you call certain functions:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(conflicted)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(scrutiny)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(roundwork)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">conflict_prefer_matching</span>(<span class="st">&quot;round&quot;</span>, <span class="st">&quot;roundwork&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">conflict_prefer</span>(<span class="st">&quot;anti_trunc&quot;</span>, <span class="st">&quot;roundwork&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>You can then run <code>round_up</code> without parentheses and check
 the <code>namespace</code> signature at the bottom. If it says
 <code>namespace:roundwork</code>, everything is fine. If not, please <a href="https://github.com/lhdjung/roundwork/issues">open an
 issue</a>.</p>
+<p>Package developers can simply use <code>package::function()</code>
+syntax, as usual, or call <code>usethis::use_import_from()</code>. With
+scrutiny 1.0.0 or later, there is no conflict to resolve.</p>
 </div>
 
 

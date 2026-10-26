@@ -39,6 +39,108 @@ ul.task-list{list-style: none;}
 
 
 
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -239,11 +341,41 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p>Many functions in errorverse packages like <a href="https://lhdjung.github.io/scrutiny/">scrutiny</a> have a
-<code>rounding</code> argument that controls how numbers are rounded.
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(roundwork)</span></code></pre></div>
+<p><code>reround()</code> has a <code>rounding</code> argument that
+controls how numbers are assumed to have been rounded, and so do
+<code>unround()</code>, <code>reround_to_fraction()</code>,
+<code>rounding_bias()</code>, and the many functions in downstream
+packages such as <a href="https://lhdjung.github.io/scrutiny/">scrutiny</a> that call them.
 Specify <code>rounding</code> as any of the strings below.</p>
-<div id="in-the-errorverse" class="section level2">
-<h2>In the errorverse</h2>
+<div id="which-option-to-choose" class="section level2">
+<h2>Which option to choose</h2>
+<p>For consistency testing, the default is almost always the right
+choice, and there is usually no need to identify the software behind a
+paper.</p>
+<p><code>rounding = &quot;up_or_down&quot;</code> counts a value set as consistent
+if the reported number matches either of the two rounded results. This
+covers every way of breaking a tie at 5: up, down, to even, away from
+zero, and toward zero. A value set is therefore never rejected because
+the wrong tie-breaking rule was assumed.
+<code>rounding = &quot;ceiling_or_floor&quot;</code> is even more permissive and
+covers every rounding procedure, including truncation and custom
+thresholds.</p>
+<p>Specifying a single procedure narrows the range of values the test
+accepts, but does not simply make it stricter. <code>&quot;up&quot;</code> and
+<code>&quot;down&quot;</code> each admit one half of the default’s ties, so they
+can only reject what the default accepts. <code>&quot;even&quot;</code> leads to
+the same results as the default; see the note on rounding to even below.
+<code>&quot;trunc&quot;</code>, <code>&quot;ceiling&quot;</code>, <code>&quot;floor&quot;</code>,
+<code>&quot;anti_trunc&quot;</code>, and the <code>&quot;*_from&quot;</code> methods with a
+<code>threshold</code> other than 5 shift the range instead, so they may
+accept value sets that the default rejects, and vice versa. A single
+procedure is appropriate if there is positive evidence about how the
+numbers were produced. Without such evidence, it may lead to false
+positives or negatives, so in case of doubt, keep the default.</p>
+</div>
+<div id="the-options" class="section level2">
+<h2>The options</h2>
 <p>These options return two rounded numbers for each input number. In
 consistency tests, this means counting a value set as consistent if the
 reported number matches either of the two rounded reconstructed
@@ -253,15 +385,17 @@ numbers.</p>
 5, one down from 5; in this order.</li>
 <li><code>&quot;up_from_or_down_from&quot;</code>: one number rounded up, one down
 — but not from 5. Instead, specify <code>threshold</code> as the number
-from which the input should be rounded.</li>
+from which the input should be rounded. Like <code>&quot;up_or_down&quot;</code>,
+it spans exactly one rounding step, wherever you put the threshold.</li>
 <li><code>&quot;ceiling_or_floor&quot;</code>: one number ceiled, one
 floored.</li>
 </ul>
 <p>By contrast, these options only return one rounded number per
 input:</p>
 <ul>
-<li><code>&quot;even&quot;</code> rounds to the next even number, using base R’s
-own <code>round()</code>. See note below.</li>
+<li><code>&quot;even&quot;</code> rounds to the nearest number, breaking a tie
+toward the even one, using base R’s own <code>round()</code>. See the
+note below.</li>
 <li><code>&quot;up&quot;</code> or <code>&quot;down&quot;</code> rounds in the specified
 direction, starting at 5.</li>
 <li><code>&quot;up_from&quot;</code> or <code>&quot;down_from&quot;</code> rounds in the
@@ -272,52 +406,335 @@ next higher or lower decimal place, respectively.</li>
 <li><code>&quot;trunc&quot;</code> and <code>&quot;anti_trunc&quot;</code> always round
 towards zero or away from it.</li>
 </ul>
+<p>Two arguments modify these procedures:</p>
+<ul>
+<li><code>symmetric</code> applies the procedure to the absolute value
+of a negative number and then restores the sign. For the methods that
+round from 5, this amounts to deciding how ties in negative numbers are
+broken. The next section explains why this matters.</li>
+<li><code>threshold</code> moves the point at which
+<code>&quot;up_from&quot;</code> and <code>&quot;down_from&quot;</code> switch direction. It
+means the same thing in both: <code>&quot;up_from&quot;</code> goes up when the
+part cut off by rounding is at least <code>threshold</code> tenths of a
+step, and <code>&quot;down_from&quot;</code> goes down when it is at most that
+many. See <code>round_up_from()</code>.</li>
+</ul>
+<p>Finally, five options name a complete tie-breaking procedure,
+including for negative numbers, so <code>symmetric</code> has nothing
+left to decide:</p>
+<ul>
+<li><code>&quot;ties_up&quot;</code> sends a tie to the higher number,
+<code>&quot;ties_down&quot;</code> to the lower one.</li>
+<li><code>&quot;ties_away&quot;</code> sends a tie away from zero,
+<code>&quot;ties_zero&quot;</code> toward it.</li>
+<li><code>&quot;ties_even&quot;</code> sends a tie to whichever of the two is
+even.</li>
+</ul>
+<p><code>&quot;ties_even&quot;</code> is another name for <code>&quot;even&quot;</code>.
+Unlike the other four, it does not correspond to any combination with
+<code>symmetric</code>, because rounding to even treats negative numbers
+the same way in either case. It is included because
+<em>roundTiesToEven</em> is IEEE 754’s default direction.</p>
+<p><code>&quot;ties_up&quot;</code> is <code>&quot;up&quot;</code> with
+<code>symmetric = FALSE</code>; <code>&quot;ties_away&quot;</code> is
+<code>&quot;up&quot;</code> with <code>symmetric = TRUE</code>. These names exist
+because the translation between the two spellings is easy to confuse,
+and because “up” means away from zero in Excel, Java, and Python but
+refers to the number line in roundwork. The matching functions are
+<code>round_ties_up()</code>, <code>round_ties_down()</code>,
+<code>round_ties_away()</code>, <code>round_ties_zero()</code>, and
+<code>round_ties_even()</code>.</p>
+<p>Combining the two spellings with <code>symmetric = TRUE</code> is an
+error. <code>rounding = &quot;ties_up&quot;, symmetric = TRUE</code> looks like a
+request to round ties away from zero, but <code>&quot;ties_up&quot;</code> already
+determines the direction. Write <code>rounding = &quot;ties_away&quot;</code>
+instead, or <code>rounding = &quot;up&quot;, symmetric = TRUE</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">reround</span>(<span class="sc">-</span><span class="fl">2.5</span>, <span class="at">digits =</span> <span class="dv">0</span>, <span class="at">rounding =</span> <span class="st">&quot;ties_up&quot;</span>, <span class="at">symmetric =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; Error in `reround()`:</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; ! `symmetric` must not be `TRUE` with `rounding = &quot;ties_up&quot;`.</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; ✖ It is TRUE.</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; ℹ A &quot;ties_*&quot; string names a complete tie-breaking procedure, so it already</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;   determines which way ties go for negative numbers.</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; ℹ For ties away from zero, set `rounding` to &quot;ties_away&quot;.</span></span></code></pre></div>
+<p>Between them, these five names and <code>&quot;ceiling&quot;</code>,
+<code>&quot;floor&quot;</code>, and <code>&quot;trunc&quot;</code> cover every rounding
+direction IEEE 754 defines:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">IEEE 754</th>
+<th align="left">roundwork</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><em>roundTiesToEven</em> (the standard’s default)</td>
+<td align="left"><code>&quot;even&quot;</code>, <code>&quot;ties_even&quot;</code></td>
+</tr>
+<tr class="even">
+<td align="left"><em>roundTiesToAway</em></td>
+<td align="left"><code>&quot;ties_away&quot;</code> (<code>&quot;up&quot;</code> with
+<code>symmetric = TRUE</code>)</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>roundTowardPositive</em></td>
+<td align="left"><code>&quot;ceiling&quot;</code></td>
+</tr>
+<tr class="even">
+<td align="left"><em>roundTowardNegative</em></td>
+<td align="left"><code>&quot;floor&quot;</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><em>roundTowardZero</em></td>
+<td align="left"><code>&quot;trunc&quot;</code></td>
+</tr>
+</tbody>
+</table>
+<p>The standard has no name for <code>&quot;ties_up&quot;</code>,
+<code>&quot;ties_zero&quot;</code>, or <code>&quot;anti_trunc&quot;</code>, which are
+Stata’s, Python’s <code>ROUND_HALF_DOWN</code>, and Excel’s
+<code>ROUNDUP()</code> respectively.</p>
+</div>
+<div id="negative-numbers-symmetric" class="section level2">
+<h2>Negative numbers: <code>symmetric</code></h2>
+<p><code>symmetric</code> matters whenever your data contain negative
+values: difference scores, z-scores, effect sizes, temperature
+scales.</p>
+<p>By default (<code>symmetric = FALSE</code>), roundwork reads “up” and
+“down” on the number line, so a negative tie goes up toward zero:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">round_up</span>(<span class="sc">-</span><span class="fl">2.5</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; [1] -2</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">round_down</span>(<span class="sc">-</span><span class="fl">2.5</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; [1] -3</span></span></code></pre></div>
+<p>With <code>symmetric = TRUE</code>, a negative number is rounded like
+its absolute value, so a tie moves <em>away</em> from zero:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">round_up</span>(<span class="sc">-</span><span class="fl">2.5</span>, <span class="at">symmetric =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; [1] -3</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">round_down</span>(<span class="sc">-</span><span class="fl">2.5</span>, <span class="at">symmetric =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; [1] -2</span></span></code></pre></div>
+<p>Most statistical software does the second thing. Excel, SPSS, SAS,
+and Matlab all round <code>-2.5</code> to <code>-3</code>; in IEEE 754
+terms, this is <em>roundTiesToAway</em>. Stata is the exception, as the
+table below shows. So if you set <code>rounding</code> to a single
+direction on data with negative values, you almost always want
+<code>symmetric = TRUE</code> as well.</p>
+<p>If you would rather not have to remember which way round that is, say
+it directly:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">round_ties_away</span>(<span class="sc">-</span><span class="fl">2.5</span>)   <span class="co"># Excel, SPSS, SAS, Matlab</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; [1] -3</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">round_ties_up</span>(<span class="sc">-</span><span class="fl">2.5</span>)     <span class="co"># Stata</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; [1] -2</span></span></code></pre></div>
+<p><code>symmetric</code> only affects negative numbers. With
+<code>&quot;up&quot;</code>, <code>&quot;down&quot;</code>, and <code>&quot;up_or_down&quot;</code>,
+it only affects ties among them, because the midpoint between two
+candidates is the same whether or not the sign is removed first. With
+<code>&quot;up_from&quot;</code> and <code>&quot;down_from&quot;</code> at a
+<code>threshold</code> other than 5, it affects more than ties, because
+the point at which these procedures switch direction is not the
+midpoint:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">round_up_from</span>(<span class="sc">-</span><span class="fl">4.28</span>, <span class="at">digits =</span> <span class="dv">1</span>, <span class="at">threshold =</span> <span class="dv">9</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; [1] -4.3</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">round_up_from</span>(<span class="sc">-</span><span class="fl">4.28</span>, <span class="at">digits =</span> <span class="dv">1</span>, <span class="at">threshold =</span> <span class="dv">9</span>, <span class="at">symmetric =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; [1] -4.2</span></span></code></pre></div>
+<p>Under the default <code>rounding = &quot;up_or_down&quot;</code>, both results
+are accepted, so <code>symmetric</code> cannot change a test result.</p>
 </div>
 <div id="rounding-at-5-in-other-software" class="section level2">
 <h2>Rounding at 5 in other software</h2>
-<p>If the decimal portion to be cut off by rounding is 5, how do these
-technologies round?</p>
-<ul>
-<li><p><a href="https://docs.python.org/3/library/functions.html#round">Python</a>’s
-standard rounding function rounds to even.</p></li>
-<li><p><a href="https://sr.ipsosinteractive.com/SPSSMR/Reporter/doc/en/help/ref_rounding.htm">SPSS</a>
-rounds to even by default, but users may choose to round up
-instead.</p></li>
-<li><p>Matlab rounds away from zero by default (i.e., it rounds up if
-the input is positive). However, other rounding procedures can be
-chosen.</p></li>
-<li><p>In <a href="https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.5/lefunctionsref/p0tj6cmga7p8qln1ejh6ebevm0c9.htm">SAS</a>,
-<code>ROUND()</code> rounds up, and <code>ROUNDE()</code> rounds to
-even. Both have a small tolerance. <code>ROUNDZ()</code> rounds to even
-without a tolerance.</p></li>
-<li><p><a href="https://www.stata.com/manuals13/m-5trunc.pdf">Stata</a>
-seemingly rounds to even, but the documentation is not very
-explicit.</p></li>
-<li><p>In <a href="https://support.microsoft.com/en-us/office/round-a-number-f82b440b-689d-4221-b21e-38da99d33435">Excel</a>,
-<code>ROUND()</code> rounds up from 5, <code>ROUNDUP()</code> ceils the
-number, and <code>ROUNDDOWN()</code> floors it.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p></li>
-</ul>
+<p>If the part cut off by rounding is exactly 5, how do these programs
+round, and which roundwork settings reconstruct them?</p>
+<p>The <code>rounding</code> and <code>symmetric</code> columns are one
+way to say it; the <code>&quot;ties_*&quot;</code> equivalent is in brackets. Use
+one or the other, not both: a <code>&quot;ties_*&quot;</code> string cannot be
+combined with <code>symmetric = TRUE</code>.</p>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Software</th>
+<th align="left">Function</th>
+<th align="left"><code>rounding</code></th>
+<th align="left"><code>symmetric</code></th>
+<th align="left">Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Excel</td>
+<td align="left"><code>ROUND()</code></td>
+<td align="left"><code>&quot;up&quot;</code> (<code>&quot;ties_away&quot;</code>)</td>
+<td align="left"><code>TRUE</code></td>
+<td align="left"><a href="https://support.microsoft.com/en-US/Excel/round-a-number">Absolute
+value is rounded, then the sign is reapplied</a></td>
+</tr>
+<tr class="even">
+<td align="left">Excel</td>
+<td align="left"><code>ROUNDUP()</code></td>
+<td align="left"><code>&quot;anti_trunc&quot;</code></td>
+<td align="left">—</td>
+<td align="left">Away from zero, <em>not</em> ceiling</td>
+</tr>
+<tr class="odd">
+<td align="left">Excel</td>
+<td align="left"><code>ROUNDDOWN()</code></td>
+<td align="left"><code>&quot;trunc&quot;</code></td>
+<td align="left">—</td>
+<td align="left">Toward zero</td>
+</tr>
+<tr class="even">
+<td align="left">Google Sheets</td>
+<td align="left"><code>ROUND()</code>, <code>ROUNDUP()</code>,
+<code>ROUNDDOWN()</code></td>
+<td align="left">as Excel</td>
+<td align="left">as Excel</td>
+<td align="left">Follows Excel</td>
+</tr>
+<tr class="odd">
+<td align="left">SPSS</td>
+<td align="left"><code>RND()</code></td>
+<td align="left"><code>&quot;up&quot;</code> (<code>&quot;ties_away&quot;</code>)</td>
+<td align="left"><code>TRUE</code></td>
+<td align="left">Ties away from zero; the fuzz is user-settable
+(<code>SET FUZZBITS</code>)</td>
+</tr>
+<tr class="even">
+<td align="left">SPSS</td>
+<td align="left"><code>TRUNC()</code></td>
+<td align="left"><code>&quot;trunc&quot;</code></td>
+<td align="left">—</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">SAS</td>
+<td align="left"><code>ROUND()</code></td>
+<td align="left"><code>&quot;up&quot;</code> (<code>&quot;ties_away&quot;</code>)</td>
+<td align="left"><code>TRUE</code></td>
+<td align="left">“Rounds up the absolute value and restores the original
+sign”, with fuzzing</td>
+</tr>
+<tr class="even">
+<td align="left">SAS</td>
+<td align="left"><code>ROUNDE()</code>, <code>ROUNDZ()</code></td>
+<td align="left"><code>&quot;even&quot;</code></td>
+<td align="left">—</td>
+<td align="left"><code>ROUNDE()</code> fuzzes, <code>ROUNDZ()</code>
+does not</td>
+</tr>
+<tr class="odd">
+<td align="left">Matlab</td>
+<td align="left"><code>round()</code></td>
+<td align="left"><code>&quot;up&quot;</code> (<code>&quot;ties_away&quot;</code>)</td>
+<td align="left"><code>TRUE</code></td>
+<td align="left">“Rounds away from zero to the nearest integer with
+larger magnitude”; a <code>TieBreaker</code> option overrides this</td>
+</tr>
+<tr class="even">
+<td align="left">Stata</td>
+<td align="left"><a href="https://www.stata.com/manuals/fnmathematicalfunctions.pdf"><code>round()</code></a></td>
+<td align="left"><code>&quot;up&quot;</code> (<code>&quot;ties_up&quot;</code>)</td>
+<td align="left"><code>FALSE</code></td>
+<td align="left">“x is always rounded up to the larger value <span class="math display">\[...\]</span> <code>round(-4.5)</code> is −4”</td>
+</tr>
+<tr class="odd">
+<td align="left">R (&gt;= 4.0.0)</td>
+<td align="left"><a href="https://rpubs.com/maechler/Rounding"><code>round()</code></a></td>
+<td align="left"><code>&quot;even&quot;</code></td>
+<td align="left">—</td>
+<td align="left">Measures which neighbor is closer on the binary
+double</td>
+</tr>
+<tr class="even">
+<td align="left">Python</td>
+<td align="left"><a href="https://docs.python.org/3/builtins/functions.html#round"><code>round()</code></a></td>
+<td align="left"><code>&quot;even&quot;</code></td>
+<td align="left">—</td>
+<td align="left">Own algorithm for inexact ties; can differ from R</td>
+</tr>
+<tr class="odd">
+<td align="left">Python</td>
+<td align="left"><a href="https://docs.python.org/3/library/decimal.html"><code>decimal</code></a>
+<code>ROUND_HALF_UP</code></td>
+<td align="left"><code>&quot;up&quot;</code> (<code>&quot;ties_away&quot;</code>)</td>
+<td align="left"><code>TRUE</code></td>
+<td align="left">In this vocabulary, “up” means away from zero</td>
+</tr>
+<tr class="even">
+<td align="left">NumPy</td>
+<td align="left"><a href="https://numpy.org/doc/stable/reference/generated/numpy.round.html"><code>np.round()</code></a></td>
+<td align="left"><code>&quot;even&quot;</code></td>
+<td align="left">—</td>
+<td align="left">Own algorithm for inexact ties</td>
+</tr>
+</tbody>
+</table>
+<p>Three points in the table require explanation.</p>
+<p>Stata is the exception. Its manual is explicit that ties go to the
+larger value on the number line, so <code>round(4.5)</code> is 5 and
+<code>round(-4.5)</code> is −4. That is roundwork’s default,
+<code>symmetric = FALSE</code>. Every other program in the table rounds
+negative numbers like their absolute values.</p>
+<p>“Rounding up” means two different things. Excel’s and Google Sheets’
+<code>ROUNDUP()</code> round away from zero:
+<code>ROUNDUP(-3.14159, 1)</code> is <code>-3.2</code>. That is
+roundwork’s <code>&quot;anti_trunc&quot;</code>, not <code>&quot;ceiling&quot;</code>, which
+would give <code>-3.1</code>; the two coincide for positive numbers
+only. Likewise, <code>ROUNDDOWN()</code> is <code>&quot;trunc&quot;</code>, not
+<code>&quot;floor&quot;</code>. The same pair appears as Java’s
+<code>RoundingMode.UP</code> and <code>DOWN</code> and as Python’s
+<code>decimal.ROUND_UP</code> and <code>ROUND_DOWN</code>.</p>
+<p>Several programs apply a small tolerance to counter floating-point
+error, and so does roundwork. SAS’s <code>ROUND()</code> performs “extra
+computations, called fuzzing, to try to make the result agree with
+decimal arithmetic”, and SPSS exposes the same idea as a user setting.
+roundwork’s rounding functions nudge a value by about
+<code>1.5e-9</code>, so that <code>round_up(0.145, 2)</code> is
+<code>0.15</code> rather than <code>0.14</code>. See the
+<em>Floating-point tolerance</em> section of <code>?round_up</code>.</p>
 </div>
 <div id="note-on-rounding-to-even" class="section level2">
 <h2>Note on rounding to even</h2>
-<p>Rounding to the next even number is not reliable. The fundamental
-facts of floating-point computation imply that results may vary in
-unpredictable ways. See this <a href="https://lhdjung.github.io/roundwork/articles/rounding-in-depth.html#to-even-base-r">explanation
-of <code>base::round()</code></a>, or a <a href="https://docs.python.org/3/tutorial/floatingpoint.html#tut-fp-issues">more
-general article</a> about the limits of floating-point arithmetic.</p>
+<p><code>rounding = &quot;even&quot;</code> calls base R’s <code>round()</code>.
+R, Python, and NumPy all round exact ties to even, but each settles
+inexact cases with its own algorithm, so they can disagree: R rounds
+<code>1.05</code> to <code>1.0</code>, Python to <code>1.1</code>. Most
+decimal fractions have no exact binary representation, so a number that
+looks like a tie usually is not one, and the result can’t be predicted
+from the number as printed. See
+<code>vignette(&quot;rounding-in-depth&quot;)</code>, section <em>To
+even</em>.</p>
+<p>The consistency tests account for this by treating both bounds as
+inclusive under <code>&quot;even&quot;</code>. These are the same bounds as under
+<code>&quot;up_or_down&quot;</code>, so <code>rounding = &quot;even&quot;</code> gives the
+same test results as the default. Knowing that a paper’s numbers were
+computed in R therefore does not make the tests stricter.</p>
 </div>
-<div class="footnotes footnotes-end-of-document">
-<hr />
-<ol>
-<li id="fn1"><p>Excel’s naming is inconsistent with roundwork’s usage.
-For instance, <code>ROUNDUP()</code> <em>always</em> rounds to the
-higher number, which is called ceiling in roundwork (and in more common
-parlance). However, roundwork’s notion of <code>&quot;up&quot;</code> relies on a
-shared understanding with the user that numbers will only be rounded up
-from 5, not from any lower value; likewise with <code>&quot;down&quot;</code>.
-This is arguably suboptimal: compare <code>roundwork::round_up()</code>
-to the more explicit naming of <code>janitor::round_half_up()</code>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-</ol>
+<div id="a-note-on-roundworks-names" class="section level2">
+<h2>A note on roundwork’s names</h2>
+<p>roundwork’s <code>&quot;up&quot;</code> means rounding up from 5, not rounding
+up in every case. The latter is what “rounding up” means in everyday
+language, and what roundwork calls <code>&quot;ceiling&quot;</code>. Read
+<code>&quot;up&quot;</code> and <code>&quot;down&quot;</code> as short for “up from 5” and
+“down from 5”. The <code>&quot;ties_*&quot;</code> options and
+<code>round_ties_*()</code> functions name the procedure explicitly.</p>
+<p>They are not called <code>round_half_up()</code> because
+<code>janitor::round_half_up()</code> is <em>roundTiesToAway</em>
+(<code>janitor::round_half_up(-2.5)</code> is <code>-3</code>), as are
+Java’s <code>RoundingMode.HALF_UP</code> and Python’s
+<code>decimal.ROUND_HALF_UP</code>. A roundwork function of the same
+name that rounded ties toward <code>+Inf</code> would return the
+opposite result for the same input. <code>&quot;ties_away&quot;</code> is
+unambiguous.</p>
+<p>Where the IEEE 754 standard has a name for a procedure, roundwork
+offers that name too: <code>round_ties_to_away()</code> is
+<code>round_ties_away()</code>, <code>round_toward_positive()</code> is
+<code>round_ceiling()</code>, and so on. See <code>?ieee-754</code> for
+the full mapping.</p>
 </div>
 
 

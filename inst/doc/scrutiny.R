@@ -4,9 +4,10 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ----eval=FALSE, include=FALSE------------------------------------------------
-#  library(conflicted)
-#  library(scrutiny)
-#  library(roundwork)
-#  conflict_prefer_matching("round", "roundwork", quiet = TRUE)
+## ----eval=FALSE---------------------------------------------------------------
+# library(conflicted)
+# library(scrutiny)
+# library(roundwork)
+# conflict_prefer_matching("round", "roundwork", quiet = TRUE)
+# conflict_prefer("anti_trunc", "roundwork", quiet = TRUE)
 
